@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Menu Interativo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body { box-sizing: border-box; font-family: 'Raleway', sans-serif; background: #faf9f7; }
+.font-display { font-family: 'Playfair Display', serif; }
+.tab { padding: .75rem 1.25rem; border-radius: 9999px; background: #f5e6f0; color: #1a1a2e; font-weight: 500; white-space: nowrap; transition: all .3s ease; cursor: pointer; }
+.tab:hover { background: #f0cfe0; }
+.tab.active { background: linear-gradient(135deg, #d4478b 0%, #c7357e 100%); color: white; }
+.menu-item { transition: all .3s ease; cursor: pointer; background: white; padding: 1rem; border-radius: .75rem; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); }
+.menu-item:hover { transform: translateX(8px); }
+.order-item { animation: slideIn .3s ease-out; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+button.finalizar { margin-top: 1rem; background-color: #25D366; color: white; font-weight: bold; padding: .5rem; border-radius: .5rem; width: 100%; text-align: center; }
+</style>
+</head>
+<body class="h-full">
+
+<header class="sticky top-0 bg-white/90 backdrop-blur border-b">
+  <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between">
+    <div>
+      <h1 class="font-display text-3xl font-bold text-pink-600">Cecília Delights</h1>
+      <p class="text-sm uppercase tracking-widest text-pink-300">Doçura Artesanal</p>
+    </div>
+    <div class="text-right">
+      <p class="text-xs uppercase">Seu Pedido</p>
+      <p id="order-total" class="font-display text-xl font-bold text-pink-600">KZ0</p>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6 flex gap-6">
+  <!-- MENU -->
+  <section class="flex-1">
+    <div class="flex gap-2 mb-6 overflow-x-auto">
+      <button onclick="setCategory('bolos')" id="tab-bolos" class="tab active">Bolos</button>
+      <button onclick="setCategory('fatias')" id="tab-fatias" class="tab">Fatias</button>
+      <button onclick="setCategory('massas')" id="tab-massas" class="tab">Massas</button>
+      <button onclick="setCategory('coberturas')" id="tab-coberturas" class="tab">Coberturas</button>
+      <button onclick="setCategory('biscoitos')" id="tab-biscoitos" class="tab">Biscoitos</button>
+      <button onclick="setCategory('bolasBerlim')" id="tab-bolasBerlim" class="tab">Bolas Berlim</button>
+      <button onclick="setCategory('salgados')" id="tab-salgados" class="tab">Salgados</button>
+    </div>
+    <div id="menu-container" class="space-y-3"></div>
+  </section>
+
+  <!-- RESUMO -->
+  <aside class="w-80 bg-white rounded-xl shadow p-4">
+    <h2 class="font-display text-lg mb-4">Resumo do Pedido</h2>
+    <div id="order-items">
+      <p class="text-gray-400 text-sm text-center">Selecione itens do menu</p>
+    </div>
+    <div class="mt-4 flex justify-between font-bold">
+      <span>Total</span>
+      <span id="sidebar-total" class="text-pink-600">KZ0</span>
+    </div>
+    <button class="finalizar" onclick="finalizarPedido()">Finalizar Pedido</button>
+  </aside>
+</main>
+
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 hidden bg-black/50 flex items-center justify-center">
+  <div class="bg-white rounded-xl w-full max-w-lg p-6">
+    <h3 id="modal-title" class="font-display text-xl mb-2"></h3>
+    <p id="modal-description" class="text-sm text-gray-500 mb-4"></p>
+    <textarea id="special-notes" class="w-full border p-2 rounded mb-4" placeholder="Observações"></textarea>
+    <div class="flex justify-between items-center mb-4">
+      <span>Subtotal</span>
+      <span id="modal-subtotal" class="font-bold text-pink-600">KZ0</span>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 border rounded py-2">Cancelar</button>
+      <button onclick="addToOrder()" class="flex-1 bg-pink-600 text-white rounded py-2">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const menuData = {
+  bolos com Coberty: { color:'#d4478b', items:[
+    {id:'b1', name:'Bolo Chocolate Premium', description:'Chocolate belga', price:17000},
+    {id:'b2', name:'Bolo Branco Clássico', description:'Baunilha', price:14000},
+    {id:'b3', name:'Bolo Red Velvet', description:'Cobertura de chocolate', price:19000},
+    {id:'b4', name:'Bolo Simples', description:'Massa branca', price:10000},
+    {id:'b5', name:'Bolo de chocolate', description:'Massa de chocolate', price:14000}
+  ]},
+  fatias:{ color:'#f5a3c7', items:[
+    {id:'f1', name:'Fatia Chocolate composta', description:'Recheio de brigadeiro de chocolate e leite ninho', price:3500},
+    {id:'f2', name:'Bolo Branco Clássico', description:'Cobertura Baunilha', price:3500},
+    {id:'f3', name:'Bolo Cenoura', description:'Cobertura de Chocolate', price:3500},
+    {id:'f4', name:'Bolo Red Velvet', description:'Cobertura de Chocolate', price:3500}
+  ]},
+  massas:{ color:'#fdb4d5', items:[
+    {id:'m1', name:'Massa Chocolate', description:'Base de chocolate premium', price:7000},
+    {id:'m2', name:'Massa Branca', description:'Massa leve', price:6000}
+  ]},
+  coberturas:{ color:'#ff99b9', items:[
+    {id:'c1', name:'Ganache', description:'Chocolate', price:3000},
+    {id:'c2', name:'Chocolate Branco', description:'Doce', price:2800}
+  ]},
+  biscoitos:{ color:'#f7c6de', items:[
+    {id:'bi1', name:'Biscoito Manteiga', description:'Clássico', price:4500}
+  ]},
+  bolasBerlim:{ color:'#ff88aa', items:[
+    {id:'bb1', name:'Bola de Berlim', description:'Creme', price:3200}
+  ]},
+  salgados:{ color:'#e8b4cc', items:[
+    {id:'sa1', name:'Coxinha', description:'Frango', price:2500}
+  ]}
+};
+
+let currentCategory='bolos';
+let currentItem=null;
+let orderItems=[];
+
+// ======= LOCAL STORAGE =======
+function salvarCarrinho() { localStorage.setItem('orderItems', JSON.stringify(orderItems)); }
+function carregarCarrinho() {
+  const saved = JSON.parse(localStorage.getItem('orderItems'));
+  if(saved && saved.length>0){ orderItems = saved; updateOrder(); }
+}
+
+// ======= MENU =======
+function renderMenu(){
+  const container=document.getElementById('menu-container');
+  const category=menuData[currentCategory];
+  container.innerHTML=category.items.map(item=>`
+    <div class="menu-item" onclick="openModal('${item.id}')">
+      <h3 class="font-display font-bold">${item.name}</h3>
+      <p class="text-sm text-gray-500">${item.description}</p>
+      <p class="font-bold text-pink-600 mt-2">KZ${item.price}</p>
+    </div>
+  `).join('');
+}
+
+function setCategory(cat){
+  currentCategory=cat;
+  document.querySelectorAll('.tab').forEach(btn=>btn.classList.remove('active'));
+  document.getElementById(`tab-${cat}`).classList.add('active');
+  renderMenu();
+}
+
+// ======= MODAL =======
+function openModal(id){
+  const item=menuData[currentCategory].items.find(i=>i.id===id);
+  currentItem=item;
+  document.getElementById('modal-title').textContent=item.name;
+  document.getElementById('modal-description').textContent=item.description;
+  document.getElementById('modal-subtotal').textContent=`KZ${item.price}`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
+
+// ======= PEDIDO =======
+function addToOrder(){
+  const notes = document.getElementById('special-notes').value;
+  orderItems.push({...currentItem, notes});
+  salvarCarrinho();
+  updateOrder();
+  closeModal();
+}
+
+function updateOrder(){
+  const container=document.getElementById('order-items');
+  let total=0;
+  if(orderItems.length===0){
+    container.innerHTML='<p class="text-gray-400 text-sm text-center">Selecione itens do menu</p>';
+  } else {
+    container.innerHTML=orderItems.map(item=>{
+      total+=item.price;
+      return `<p>${item.name} - KZ${item.price}${item.notes ? ' ('+item.notes+')' : ''}</p>`;
+    }).join('');
+  }
+  document.getElementById('order-total').textContent=`KZ${total}`;
+  document.getElementById('sidebar-total').textContent=`KZ${total}`;
+}
+
+// ======= FINALIZAR PEDIDO =======
+function finalizarPedido(){
+  if(orderItems.length===0){ alert('Selecione ao menos um item!'); return; }
+  let mensagem = 'Olá! Gostaria de fazer o seguinte pedido:\n';
+  orderItems.forEach(item=>{
+    mensagem += `- ${item.name} KZ${item.price}${item.notes ? ' ('+item.notes+')' : ''}\n`;
+  });
+  const total = orderItems.reduce((acc,i)=>acc+i.price,0);
+  mensagem += `Total: KZ${total}`; 
+  <button id="checkout-btn" onclick="checkout()" class="mt-4 w-full bg-green-600 text-white py-2 rounded font-bold">
+  Finalizar Pedido (WhatsApp)
+</button>
+}
+
+// ======= INIT =======
+carregarCarrinho();
+renderMenu();
+</script>
+
+</body>
+</html>

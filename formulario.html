@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>encontre o driver</title>
+    <style>
+        body { font-family: arial, sans-serif; padding:20px; background:#fff;}
+        label, select, button{display:block; margin:8px 0; }
+        .result { margin-top:12px; padding:12px; border:1px solid #ddd; background:#f9f9f9; }
+
+    </style>
+</head>
+<body>
+    <h2> Encontrar driver HP ProBook 6550b</h2>
+    <label for="os">escolha o sistema operativo: </label>
+    select id="os">
+    <option value="win7">windows 7(32/64-bit)</option>
+    <option value="win10">windows 10 (64-bit)</option>
+    <option value="win11">windows 11 (64-bit)</option>
+    </section>
+
+    <button id="btn">Mostrar instruçoes</button>
+    <div class="result" id="result" hidden></div>
+
+    <script>
+        document.getElementById('btn'). addEventListener('click', function() { 
+         var os = document.getElementById('os'). value;
+         var text= '';
+         if (os ==='win10') {
+            text = '<strong>windows 10 (64-bit) </strong><br>' +'1. Baixe o driver wireless LAN correspondente (Intel/Broadcom).<br>' +
+            '2. copie o ficheiro .exe para uma pen USB.<br>' + '3. No ProBook: execute o .exe e reinicie o computador.';
+         
+    } else if (os ==='win7'){  
+     text ='<strong>windows 7</strong><br> se o driver for antigo, instale o chipset primeiro, depois o driver de rede.';)
+    }else { 
+        text = '<strong>windows 11</strong><br>Se o driver oficial não tiver versão para win11, tente o modo de conmpatibilidade ou use um adaptador USB wi-fi.';
+
+    }
+    var out= document.getElementById('result');
+    out.innerHTML =text;
+    out.hidden = false;
+     } )
+
+
+          
+            </script>
+    
+</body>
+</html>
